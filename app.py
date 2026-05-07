@@ -3389,9 +3389,9 @@ elif page == "👤 About":
     st.write("")
     col_a, col_b = st.columns([1, 1])
     with col_a:
-        render_profile("Andre Oneal A. Plaza", "andre_oneal_a._plaza.png")
+        render_profile("Andre Oneal A. Plaza", "andre.png")
     with col_b:
-        render_profile("Rica Baliling", "rica_baliling.png")
+        render_profile("Rica Baliling", "rica.png")
     st.markdown("---")
     st.markdown(
         "<div style='font-size:15px;color:#d4a954;font-weight:700;'>All glory to God.</div>",
