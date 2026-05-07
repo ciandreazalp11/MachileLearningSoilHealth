@@ -1301,9 +1301,11 @@ def upload_and_preprocess_widget():
                     continue
 
                 if file.name.endswith(".csv"):
-                    df_file = pd.read_csv(file)
+                    with st.spinner(f"📂 Loading {file.name}..."):
+                        df_file = pd.read_csv(file)
                 else:
-                    df_file = pd.read_excel(file)
+                    with st.spinner(f"📂 Loading {file.name}..."):
+                        df_file = pd.read_excel(file)
 
                 if df_file.empty:
                     st.warning(f"{file.name} is empty!")
@@ -1313,11 +1315,12 @@ def upload_and_preprocess_widget():
                     continue
 
                 # --- robust column standardization (FIRST match wins) ---
-                col_norm_map = {}
-                for c in df_file.columns:
-                    key = normalize_col_name(c)
-                    if key not in col_norm_map:
-                        col_norm_map[key] = c  # keep first encountered column
+                with st.spinner(f"🔄 Standardizing columns..."):
+                    col_norm_map = {}
+                    for c in df_file.columns:
+                        key = normalize_col_name(c)
+                        if key not in col_norm_map:
+                            col_norm_map[key] = c  # keep first encountered column
 
                 renamed = {}
                 for std_col, alt_names in column_mapping.items():
@@ -1359,29 +1362,32 @@ def upload_and_preprocess_widget():
                 st.warning(f"⚠️ Skipped {file.name}: {e}")
 
         if cleaned_dfs and any(len(x) > 0 for x in cleaned_dfs):
-            df = pd.concat(cleaned_dfs, ignore_index=True, sort=False)
-            if df.empty:
-                st.error("All loaded files are empty after concatenation.")
-                return
+            with st.spinner("🔗 Concatenating and finalizing dataset..."):
+                df = pd.concat(cleaned_dfs, ignore_index=True, sort=False)
+                if df.empty:
+                    st.error("All loaded files are empty after concatenation.")
+                    return
 
-            safe_to_numeric_columns(df, required_columns + ["Latitude", "Longitude"])
+                safe_to_numeric_columns(df, required_columns + ["Latitude", "Longitude"])
 
-            numeric_cols = df.select_dtypes(include=[np.number]).columns
-            if len(numeric_cols) > 0:
-                medians = df[numeric_cols].median()
-                df[numeric_cols] = df[numeric_cols].fillna(medians)
+            with st.spinner("🧹 Cleaning missing values..."):
+                numeric_cols = df.select_dtypes(include=[np.number]).columns
+                if len(numeric_cols) > 0:
+                    medians = df[numeric_cols].median()
+                    df[numeric_cols] = df[numeric_cols].fillna(medians)
 
-            cat_cols = df.select_dtypes(exclude=[np.number]).columns
-            for c in cat_cols:
-                try:
-                    if df[c].isnull().sum() > 0:
-                        df[c].fillna(df[c].mode().iloc[0], inplace=True)
-                except Exception:
-                    df[c].fillna(method="ffill", inplace=True)
+            with st.spinner("📊 Processing categorical data..."):
+                cat_cols = df.select_dtypes(exclude=[np.number]).columns
+                for c in cat_cols:
+                    try:
+                        if df[c].isnull().sum() > 0:
+                            df[c].fillna(df[c].mode().iloc[0], inplace=True)
+                    except Exception:
+                        df[c].fillna(method="ffill", inplace=True)
 
-            df.dropna(how="all", inplace=True)
+                df.dropna(how="all", inplace=True)
 
-            df = clip_soil_ranges(df)
+                df = clip_soil_ranges(df)
 
             missing_required = [col for col in required_columns if col not in df.columns]
             if missing_required:
@@ -1417,11 +1423,12 @@ def upload_and_preprocess_widget():
                             method_map = {"IQR": "iqr", "Z-Score": "zscore"}
                             action_map = {"Flag": "flag", "Remove": "remove", "Winsorize": "winsorize"}
                             
-                            df_processed, outlier_stats = detect_and_handle_outliers(
-                                df,
-                                method=method_map[outlier_method],
-                                action=action_map[outlier_action]
-                            )
+                            with st.spinner(f"🔍 Detecting outliers using {outlier_method} method..."):
+                                df_processed, outlier_stats = detect_and_handle_outliers(
+                                    df,
+                                    method=method_map[outlier_method],
+                                    action=action_map[outlier_action]
+                                )
                             
                             st.session_state["df"] = df_processed
                             st.success(f"✅ Outliers processed. Rows: {len(df_processed)}")
@@ -1436,7 +1443,8 @@ def upload_and_preprocess_widget():
                         )
                         
                         if st.button("Apply Imputation", key="apply_impute"):
-                            df_imputed = advanced_missing_value_imputation(df, method=impute_method)
+                            with st.spinner(f"💧 Applying {impute_method} imputation..."):
+                                df_imputed = advanced_missing_value_imputation(df, method=impute_method)
                             st.session_state["df"] = df_imputed
                             st.success(f"✅ Imputation applied using '{impute_method}' method")
                             st.dataframe(df_imputed.head())
@@ -1452,7 +1460,8 @@ def upload_and_preprocess_widget():
                                 st.markdown(f"  - {feat}")
                     
                     if st.button("Create Suggested Features", key="create_features"):
-                        df_enhanced = create_suggested_features(df)
+                        with st.spinner("⚙️ Generating feature engineering..."):
+                            df_enhanced = create_suggested_features(df)
                         st.session_state["df"] = df_enhanced
                         st.success(f"✅ Features created. New shape: {df_enhanced.shape}")
                         st.dataframe(df_enhanced.head())
@@ -1740,10 +1749,10 @@ elif page == "🤖 Modeling":
                             n_jobs=-1,
                         )
 
-                    model.fit(X_train, y_train)
-
-                    # Default prediction
-                    y_pred = model.predict(X_test)
+                    with st.spinner(🤖 Training Random Forest model..."):
+                        model.fit(X_train, y_train)
+                        # Default prediction
+                        y_pred = model.predict(X_test)
 
                     # Adjust decision boundary for the minority "High" class (cost-sensitive thresholding)
                     if (
@@ -1920,27 +1929,28 @@ elif page == "🤖 Modeling":
                                 trained = {}
                                 metrics = {}
                                 for tgt in targets:
-                                    yn = pd.to_numeric(df[tgt], errors="coerce")
-                                    yn = yn.fillna(yn.median())
+                                    with st.spinner(f"🔬 Training {tgt} predictor..."):
+                                        yn = pd.to_numeric(df[tgt], errors="coerce")
+                                        yn = yn.fillna(yn.median())
 
-                                    X_train, X_test, y_train, y_test = train_test_split(
-                                        Xn_scaled_df, yn, test_size=0.2, random_state=42
-                                    )
+                                        X_train, X_test, y_train, y_test = train_test_split(
+                                            Xn_scaled_df, yn, test_size=0.2, random_state=42
+                                        )
 
-                                    m_n = RandomForestRegressor(
-                                        n_estimators=n_estimators_n,
-                                        max_depth=max_depth_n,
-                                        random_state=42,
-                                        n_jobs=-1,
-                                    )
-                                    m_n.fit(X_train, y_train)
-                                    pred_n = m_n.predict(X_test)
+                                        m_n = RandomForestRegressor(
+                                            n_estimators=n_estimators_n,
+                                            max_depth=max_depth_n,
+                                            random_state=42,
+                                            n_jobs=-1,
+                                        )
+                                        m_n.fit(X_train, y_train)
+                                        pred_n = m_n.predict(X_test)
 
-                                    rmse_n = float(np.sqrt(mean_squared_error(y_test, pred_n)))
-                                    r2_n = float(r2_score(y_test, pred_n))
+                                        rmse_n = float(np.sqrt(mean_squared_error(y_test, pred_n)))
+                                        r2_n = float(r2_score(y_test, pred_n))
 
-                                    trained[tgt] = m_n
-                                    metrics[tgt] = {"RMSE": rmse_n, "R2": r2_n}
+                                        trained[tgt] = m_n
+                                        metrics[tgt] = {"RMSE": rmse_n, "R2": r2_n}
 
                                 # Store in session
                                 st.session_state["nutrient_models"].update(trained)
@@ -2008,7 +2018,8 @@ elif page == "📊 Visualization":
             st.caption("Comprehensive validation, profiling, and quality metrics for your dataset.")
             
             # Get validation results
-            validation_results = validate_dataset(df)
+            with st.spinner("📊 Analyzing dataset quality..."):
+                validation_results = validate_dataset(df)
             
             # Display key metrics
             q1, q2, q3, q4 = st.columns(4)
@@ -2055,7 +2066,8 @@ elif page == "📊 Visualization":
             
             # Detailed column profiling
             st.subheader("Column Profile Report")
-            profile_df = generate_data_profile_report(df)
+            with st.spinner("📋 Generating column profile report..."):
+                profile_df = generate_data_profile_report(df)
             st.dataframe(profile_df, use_container_width=True)
             
             st.markdown("---")
@@ -2515,7 +2527,8 @@ elif page == "📊 Visualization":
                         """
                         m.get_root().html.add_child(folium.Element(legend_html))
 
-                        st_folium(m, width=1024, height=520)
+                        with st.spinner(f"🗺️ Displaying {title}..."):
+                            st_folium(m, width=1024, height=520)
 
                     # 3 maps: High, Moderate, Low (stacked one-by-one)
                     _render_folium_map(
@@ -3485,9 +3498,10 @@ elif page == "🌿 Insights":
             )
         else:
             n_clusters = st.slider("Number of clusters", 2, 5, 3, step=1)
-            clustered_df, kmeans_model = run_kmeans_on_df(
-                df, cluster_features, n_clusters=n_clusters
-            )
+            with st.spinner("🔗 Running KMeans clustering..."):
+                clustered_df, kmeans_model = run_kmeans_on_df(
+                    df, cluster_features, n_clusters=n_clusters
+                )
             if clustered_df is None:
                 st.info(
                     "Not enough valid rows to run clustering with the selected number of clusters."
