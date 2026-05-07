@@ -1284,8 +1284,8 @@ def upload_and_preprocess_widget():
     if uploaded_files:
         for file in uploaded_files:
             try:
-                if hasattr(file, "size") and file.size > 8 * 1024 * 1024:
-                    st.warning(f"{file.name} is too large! Must be <8MB.")
+                if hasattr(file, "size") and file.size > 200 * 1024 * 1024:
+                    st.warning(f"{file.name} is too large! Must be <200MB.")
                     continue
                 if not (file.name.endswith(".csv") or file.name.endswith(".xlsx")):
                     st.warning(f"{file.name}: Unsupported extension.")
