@@ -16,3 +16,6 @@ shapely
 pyshp
 geopandas
 shap
+scipy
+dask
+

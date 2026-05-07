@@ -27,6 +27,15 @@ import base64
 from PIL import Image
 import warnings
 import re
+from advanced_processing import (
+    validate_dataset,
+    generate_data_profile_report,
+    advanced_missing_value_imputation,
+    detect_and_handle_outliers,
+    feature_engineering_suggestions,
+    create_suggested_features,
+    get_processing_recommendations,
+)
 
 warnings.filterwarnings("ignore", category=UserWarning)
 
@@ -1392,6 +1401,62 @@ def upload_and_preprocess_widget():
             st.dataframe(df.head())
             download_df_button(df)
             st.caption("**Preprocessed preview:** This is the cleaned/standardized version the models will use. If something looks wrong here (e.g., columns missing), adjust preprocessing or your input file.")
+            
+            # === Advanced Processing Options ===
+            with st.expander("🔧 Advanced Processing Options", expanded=False):
+                st.markdown("**Enhance your dataset with advanced processing techniques**")
+                
+                adv_col1, adv_col2 = st.columns(2)
+                
+                with adv_col1:
+                    if st.checkbox("🔍 Detect & Handle Outliers", key="outlier_check"):
+                        outlier_method = st.radio("Method:", ["IQR", "Z-Score"], key="outlier_method")
+                        outlier_action = st.radio("Action:", ["Flag", "Remove", "Winsorize"], key="outlier_action")
+                        
+                        if st.button("Apply Outlier Detection", key="apply_outliers"):
+                            method_map = {"IQR": "iqr", "Z-Score": "zscore"}
+                            action_map = {"Flag": "flag", "Remove": "remove", "Winsorize": "winsorize"}
+                            
+                            df_processed, outlier_stats = detect_and_handle_outliers(
+                                df,
+                                method=method_map[outlier_method],
+                                action=action_map[outlier_action]
+                            )
+                            
+                            st.session_state["df"] = df_processed
+                            st.success(f"✅ Outliers processed. Rows: {len(df_processed)}")
+                            st.json(outlier_stats)
+                
+                with adv_col2:
+                    if st.checkbox("💧 Advanced Missing Value Imputation", key="impute_check"):
+                        impute_method = st.selectbox(
+                            "Imputation Method:",
+                            ["auto", "median", "knn", "mean", "forward_fill"],
+                            key="impute_method"
+                        )
+                        
+                        if st.button("Apply Imputation", key="apply_impute"):
+                            df_imputed = advanced_missing_value_imputation(df, method=impute_method)
+                            st.session_state["df"] = df_imputed
+                            st.success(f"✅ Imputation applied using '{impute_method}' method")
+                            st.dataframe(df_imputed.head())
+                
+                # Feature Engineering
+                if st.checkbox("⚙️ Auto Feature Engineering", key="feature_eng_check"):
+                    suggestions = feature_engineering_suggestions(df)
+                    st.markdown("**Suggested Features:**")
+                    for feat_type, feats in suggestions.items():
+                        if feats:
+                            st.markdown(f"- **{feat_type.replace('_', ' ').title()}:**")
+                            for feat in feats:
+                                st.markdown(f"  - {feat}")
+                    
+                    if st.button("Create Suggested Features", key="create_features"):
+                        df_enhanced = create_suggested_features(df)
+                        st.session_state["df"] = df_enhanced
+                        st.success(f"✅ Features created. New shape: {df_enhanced.shape}")
+                        st.dataframe(df_enhanced.head())
+
         else:
             st.error(
                 "No valid sheets processed. Check file formats and column headers."
@@ -1933,7 +1998,73 @@ elif page == "📊 Visualization":
         st.markdown("---")
 
         # ---- Organized tabs ----
-        tab_eda, tab_spatial, tab_clusters = st.tabs(["🔎 EDA", "🗺️ Spatial", "🧩 Clusters"])
+        tab_validation, tab_eda, tab_spatial, tab_clusters = st.tabs(["📋 Data Quality", "🔎 EDA", "🗺️ Spatial", "🧩 Clusters"])
+
+        # =====================
+        # 📋 DATA QUALITY & VALIDATION
+        # =====================
+        with tab_validation:
+            st.subheader("Data Quality Assessment")
+            st.caption("Comprehensive validation, profiling, and quality metrics for your dataset.")
+            
+            # Get validation results
+            validation_results = validate_dataset(df)
+            
+            # Display key metrics
+            q1, q2, q3, q4 = st.columns(4)
+            q1.metric("Total Rows", f"{validation_results['total_rows']:,}")
+            q2.metric("Total Columns", f"{validation_results['total_cols']}")
+            q3.metric("Duplicates", f"{validation_results['duplicates']}")
+            q4.metric("Memory (MB)", f"{validation_results['memory_mb']:.2f}")
+            
+            st.markdown("---")
+            
+            # Missing values analysis
+            if validation_results['missing_values']:
+                st.subheader("Missing Values Analysis")
+                missing_df = pd.DataFrame([
+                    {
+                        "Column": col,
+                        "Count": v["count"],
+                        "Percentage": f"{v['percentage']}%"
+                    }
+                    for col, v in validation_results['missing_values'].items()
+                ])
+                st.dataframe(missing_df, use_container_width=True)
+            else:
+                st.success("✅ No missing values detected!")
+            
+            st.markdown("---")
+            
+            # Outlier detection
+            if validation_results['outliers_detected']:
+                st.subheader("Outliers Detected (IQR Method)")
+                outlier_df = pd.DataFrame([
+                    {
+                        "Column": col,
+                        "Count": v["count"],
+                        "Percentage": f"{v['percentage']}%"
+                    }
+                    for col, v in validation_results['outliers_detected'].items()
+                ])
+                st.dataframe(outlier_df, use_container_width=True)
+            else:
+                st.info("ℹ️ No outliers detected using IQR method.")
+            
+            st.markdown("---")
+            
+            # Detailed column profiling
+            st.subheader("Column Profile Report")
+            profile_df = generate_data_profile_report(df)
+            st.dataframe(profile_df, use_container_width=True)
+            
+            st.markdown("---")
+            
+            # Processing recommendations
+            st.subheader("Processing Recommendations")
+            recommendations = get_processing_recommendations(df)
+            for rec in recommendations:
+                st.info(rec)
 
         # =====================
         # 🔎 EDA
