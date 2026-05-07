@@ -1,4 +1,5 @@
 import streamlit as st
+import streamlit.components.v1 as components
 import pandas as pd
 import numpy as np
 import plotly.express as px
@@ -28,6 +29,29 @@ import warnings
 import re
 
 warnings.filterwarnings("ignore", category=UserWarning)
+
+
+def inject_tuqlas_chatbot() -> None:
+    components.html(
+        """
+        <script>
+        (function () {
+            const doc = window.parent.document;
+            if (doc.getElementById("tuqlas-chatbot-script")) return;
+
+            const script = doc.createElement("script");
+            script.id = "tuqlas-chatbot-script";
+            script.src = "https://www.tuqlas.com/chatbot.js";
+            script.dataset.key = "tq_live_e2ea6c743da14cd7f2eb52609629b42647f8a449";
+            script.dataset.api = "https://www.tuqlas.com";
+            script.defer = true;
+            doc.body.appendChild(script);
+        })();
+        </script>
+        """,
+        height=0,
+        width=0,
+    )
 
 
 # =========================
@@ -158,59 +182,66 @@ def _filter_mindanao_land_only(df_in: pd.DataFrame) -> pd.DataFrame:
 
     return df0.loc[keep_mask]
 
+
+@st.cache_data(show_spinner=False)
+def _cached_filter_mindanao_land_only(df_in: pd.DataFrame) -> pd.DataFrame:
+    return _filter_mindanao_land_only(df_in)
+
 st.set_page_config(
     page_title="Machine Learning-Driven Soil Analysis for Sustainable Agriculture System",
     layout="wide",
     page_icon="🌿",
 )
 
+inject_tuqlas_chatbot()
+
 # === THEMES (UNCHANGED) ===
 theme_classification = {
-    "background_main": "linear-gradient(120deg, #0f2c2c 0%, #1a4141 40%, #0e2a2a 100%)",
-    "sidebar_bg": "rgba(15, 30, 30, 0.95)",
-    "primary_color": "#81c784",
-    "secondary_color": "#a5d6a7",
-    "button_gradient": "linear-gradient(90deg, #66bb6a, #4caf50)",
-    "button_text": "#0c1d1d",
-    "header_glow_color_1": "#81c784",
-    "header_glow_color_2": "#4caf50",
-    "menu_icon_color": "#81c784",
-    "nav_link_color": "#e0ffe0",
-    "nav_link_selected_bg": "#4caf50",
-    "info_bg": "#214242",
-    "info_border": "#4caf50",
-    "success_bg": "#2e5c2e",
-    "success_border": "#81c784",
-    "warning_bg": "#5c502e",
-    "warning_border": "#dcd380",
-    "error_bg": "#5c2e2e",
-    "error_border": "#ef9a9a",
-    "text_color": "#e0ffe0",
-    "title_color": "#a5d6a7",
+    "background_main": "linear-gradient(135deg, #07130d 0%, #102418 48%, #1e2b18 100%)",
+    "sidebar_bg": "linear-gradient(180deg, #07130d 0%, #102418 58%, #0b1b12 100%)",
+    "primary_color": "#7bbf4d",
+    "secondary_color": "#d4a954",
+    "button_gradient": "linear-gradient(90deg, #8bc34a, #5f9f36)",
+    "button_text": "#07130d",
+    "header_glow_color_1": "#8bc34a",
+    "header_glow_color_2": "#d4a954",
+    "menu_icon_color": "#9ed56a",
+    "nav_link_color": "#eef7df",
+    "nav_link_selected_bg": "#2f6b3f",
+    "info_bg": "#13291c",
+    "info_border": "#7bbf4d",
+    "success_bg": "#183621",
+    "success_border": "#8bc34a",
+    "warning_bg": "#3a2f17",
+    "warning_border": "#d4a954",
+    "error_bg": "#3a1d18",
+    "error_border": "#d9826b",
+    "text_color": "#eef7df",
+    "title_color": "#f5f1df",
 }
 
 theme_sakura = {
-    "background_main": "linear-gradient(120deg, #2b062b 0%, #3b0a3b 50%, #501347 100%)",
-    "sidebar_bg": "linear-gradient(180deg, rgba(30,8,30,0.95), rgba(45,10,45,0.95))",
-    "primary_color": "#ff8aa2",
-    "secondary_color": "#ffc1d3",
-    "button_gradient": "linear-gradient(90deg, #ff8aa2, #ff3b70)",
-    "button_text": "#1f0f16",
-    "header_glow_color_1": "#ff93b0",
-    "header_glow_color_2": "#ff3b70",
-    "menu_icon_color": "#ff93b0",
-    "nav_link_color": "#ffd6e0",
-    "nav_link_selected_bg": "#ff3b70",
-    "info_bg": "#40132a",
-    "info_border": "#ff93b0",
-    "success_bg": "#3a1b2a",
-    "success_border": "#ff93b0",
-    "warning_bg": "#3b2530",
-    "warning_border": "#ffb3b3",
-    "error_bg": "#3a1a22",
-    "error_border": "#ff9aa3",
-    "text_color": "#ffeef8",
-    "title_color": "#ffd6e0",
+    "background_main": "linear-gradient(135deg, #08120d 0%, #182718 50%, #302719 100%)",
+    "sidebar_bg": "linear-gradient(180deg, #08120d 0%, #142116 58%, #241d12 100%)",
+    "primary_color": "#c7a04a",
+    "secondary_color": "#86c65a",
+    "button_gradient": "linear-gradient(90deg, #d4a954, #8f6f2a)",
+    "button_text": "#08120d",
+    "header_glow_color_1": "#d4a954",
+    "header_glow_color_2": "#86c65a",
+    "menu_icon_color": "#d4bd74",
+    "nav_link_color": "#f7efd8",
+    "nav_link_selected_bg": "#7a612a",
+    "info_bg": "#202817",
+    "info_border": "#c7a04a",
+    "success_bg": "#183621",
+    "success_border": "#86c65a",
+    "warning_bg": "#3a2f17",
+    "warning_border": "#d4a954",
+    "error_bg": "#3a1d18",
+    "error_border": "#d9826b",
+    "text_color": "#f7efd8",
+    "title_color": "#fff7df",
 }
 
 # === SESSION STATE ===
@@ -238,10 +269,10 @@ if "last_sidebar_selected" not in st.session_state:
     st.session_state["last_sidebar_selected"] = None
 if "location_tag" not in st.session_state:
     st.session_state["location_tag"] = ""
+if "uploaded_files_signature" not in st.session_state:
+    st.session_state["uploaded_files_signature"] = None
 
 
-if "workflow" not in st.session_state:
-    st.session_state["workflow"] = {}
 if "nutrient_models" not in st.session_state:
     st.session_state["nutrient_models"] = {}   # e.g. {"Nitrogen": model, "Phosphorus": model, "Potassium": model}
 if "nutrient_scalers" not in st.session_state:
@@ -255,100 +286,28 @@ if "nutrient_features" not in st.session_state:
 # without removing any existing features.
 # =========================
 
-OBJECTIVES = [
-    "1) Gather & consolidate high-resolution environmental and soil data",
-    "2) Preprocess & scan data through machine learning processes",
-    "3) Identify major soil parameters/trends influencing soil health & productivity",
-    "4) Formulate predictive models for fertility & nutrient deficiency",
-    "5) Evaluate the model for precision",
-]
 
-def _workflow_state() -> dict:
-    # Single dict so it's easy to reset/extend later.
-    if "workflow" not in st.session_state or not isinstance(st.session_state["workflow"], dict):
-        st.session_state["workflow"] = {}
-    return st.session_state["workflow"]
 
-def _workflow_reset() -> None:
-    st.session_state["workflow"] = {}
 
-def _workflow_mark(**kwargs) -> None:
-    wf = _workflow_state()
-    wf.update({k: bool(v) for k, v in kwargs.items()})
 
-def _workflow_is_done(key: str) -> bool:
-    return bool(_workflow_state().get(key, False))
 
-def _workflow_infer_completion() -> dict:
-    """Infer completion signals from existing session state (no new requirements)."""
-    df_ok = st.session_state.get("df") is not None
-    model_ok = st.session_state.get("model") is not None
-    results_ok = st.session_state.get("results") is not None
 
-    inferred = {
-        "obj1_data_loaded": df_ok,
-        # obj2 is explicitly marked in upload_and_preprocess_widget(), but we fall back to df presence.
-        "obj2_preprocessed": bool(_workflow_is_done("obj2_preprocessed") or df_ok),
-        # obj3 can be satisfied by EDA/Feature importance views. We'll mark it in Visualization/Results pages.
-        "obj3_params_identified": bool(_workflow_is_done("obj3_params_identified")),
-        "obj4_model_trained": bool(_workflow_is_done("obj4_model_trained") or model_ok),
-        "obj5_evaluated": bool(_workflow_is_done("obj5_evaluated") or results_ok),
-    }
-    return inferred
 
-def render_objective_banner(step_title: str, bullets: list[str], next_hint: str | None = None) -> None:
-    theme = st.session_state.get("current_theme", theme_classification)
-    border = theme.get("primary_color", "#81c784")
-    bg = "rgba(255,255,255,0.10)"
-    text = theme.get("text_color", "#e0ffe0")
-
-    items = "".join([f"<li style='margin-bottom:6px;'>{b}</li>" for b in bullets])
-    hint_html = f"<div style='margin-top:10px;opacity:0.95;'><b>Next:</b> {next_hint}</div>" if next_hint else ""
-
+def render_page_header(title: str, subtitle: str | None = None, eyebrow: str | None = None) -> None:
+    """Compact professional page heading used across the main app pages."""
+    eyebrow_html = f"<div class='page-eyebrow'>{eyebrow}</div>" if eyebrow else ""
+    subtitle_html = f"<p>{subtitle}</p>" if subtitle else ""
     st.markdown(
         f"""
-        <div style="border:1.5px solid {border}; border-radius:16px; padding:14px 16px; background:{bg}; color:{text};">
-          <div style="font-size:18px; font-weight:800; margin-bottom:8px;">{step_title}</div>
-          <ul style="margin:0 0 0 18px; padding:0;">{items}</ul>
-          {hint_html}
-        </div>
+        <section class="page-header">
+            {eyebrow_html}
+            <h1>{title}</h1>
+            {subtitle_html}
+        </section>
         """,
         unsafe_allow_html=True,
     )
 
-def render_workflow_tracker_sidebar() -> None:
-    """Small, non-intrusive workflow tracker in the sidebar."""
-    done = _workflow_infer_completion()
-
-    def _row(label, ok):
-        icon = "✅" if ok else "⬜"
-        return f"{icon} {label}"
-
-    st.markdown("### ✅ Objectives Flow")
-    st.caption("Follow the steps (1→5). Your progress is remembered while the app is running.")
-
-    st.write(_row("1. Data gathering & consolidation", done["obj1_data_loaded"]))
-    st.write(_row("2. Preprocessing & scanning", done["obj2_preprocessed"]))
-    st.write(_row("3. Key parameters & trends", done["obj3_params_identified"]))
-    st.write(_row("4. Predictive modeling", done["obj4_model_trained"]))
-    st.write(_row("5. Precision / evaluation", done["obj5_evaluated"]))
-
-    st.markdown("##### Jump to step")
-    c1, c2 = st.columns(2)
-    with c1:
-        if st.button("1–2 Home", use_container_width=True):
-            st.session_state["page_override"] = "🏠 Home"
-            st.experimental_rerun()
-        if st.button("4 Model", use_container_width=True):
-            st.session_state["page_override"] = "🤖 Modeling"
-            st.experimental_rerun()
-    with c2:
-        if st.button("3 Visuals", use_container_width=True):
-            st.session_state["page_override"] = "📊 Visualization"
-            st.experimental_rerun()
-        if st.button("5 Results", use_container_width=True):
-            st.session_state["page_override"] = "📈 Results"
-            st.experimental_rerun()
 
 
 # === APPLY THEME (FIXED, CLEAN, WORKING) ===
@@ -360,7 +319,7 @@ def inject_style(css_html: str) -> None:
     st.markdown(css_html, unsafe_allow_html=True)
 
 def apply_theme(theme: dict) -> None:
-    """Design-only: 3D pastel wave background; preserves original palettes."""
+    """Core theme shell. Behavior stays in the page code below."""
     import streamlit as st
 
     base_bg   = theme.get("background_main", "")
@@ -370,65 +329,38 @@ def apply_theme(theme: dict) -> None:
     btn_grad  = theme.get("button_gradient", "linear-gradient(90deg,#66bb6a,#4caf50)")
     btn_text  = theme.get("button_text", "#0c1d1d")
 
-    greenish = "#4caf50" in btn_grad or "#66bb6a" in btn_grad or "#0f2c2c" in base_bg
-    if greenish:
-        spot1, spot2, spot3 = "rgba(210,255,240,.45)", "rgba(175,240,220,.35)", "rgba(230,255,250,.30)"
-    else:
-        spot1, spot2, spot3 = "rgba(255,205,225,.45)", "rgba(255,185,200,.35)", "rgba(245,220,255,.30)"
-
     css = f"""
-<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&family=Playfair+Display:wght@400;700&display=swap" rel="stylesheet">
 <style>
 .stApp {{
-  font-family:'Montserrat',sans-serif!important;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif!important;
   color:{text_col};
   min-height:100vh;
-  background:{base_bg};
+  background:
+    linear-gradient(180deg, rgba(255,255,255,.025), rgba(255,255,255,0) 240px),
+    {base_bg};
   background-attachment:fixed;
-  position:relative; overflow:hidden;
+  position:relative;
+  overflow-x:hidden;
 }}
 h1,h2,h3,h4,h5,h6 {{
-  font-family:'Playfair Display',serif!important;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif!important;
   color:{title_col}; font-weight:700!important;
-  text-shadow:0 2px 4px rgba(255,255,255,.35);
-  animation:ccFloat 3s ease-in-out infinite;
-}}
-@keyframes ccFloat {{ 0%,100%{{transform:translateY(0)}} 50%{{transform:translateY(-2px)}} }}
-.stApp::before,.stApp::after {{
-  content:""; position:absolute; inset:-30%;
-  background:
-    radial-gradient(62rem 62rem at 18% 28%, {spot1} 0%, transparent 68%),
-    radial-gradient(54rem 54rem at 82% 38%, {spot2} 0%, transparent 70%),
-    radial-gradient(58rem 58rem at 40% 82%, {spot3} 0%, transparent 72%);
-  mix-blend-mode: screen; pointer-events:none; z-index:0;
-  opacity:.55; filter:blur(.3px); animation:ccWaveA 26s linear infinite;
-}}
-.stApp::after {{ opacity:.38; animation:ccWaveB 32s linear infinite reverse; }}
-@keyframes ccWaveA {{
-  0%{{transform:translate3d(0,0,0) rotate(0deg) scale(1.0)}}
-  50%{{transform:translate3d(-4%,-3%,0) rotate(180deg) scale(1.03)}}
-  100%{{transform:translate3d(-8%,-6%,0) rotate(360deg) scale(1.06)}}
-}}
-@keyframes ccWaveB {{
-  0%{{transform:translate3d(0,0,0) rotate(0deg) scale(1.0)}}
-  50%{{transform:translate3d(5%,4%,0) rotate(-180deg) scale(1.02)}}
-  100%{{transform:translate3d(9%,8%,0) rotate(-360deg) scale(1.05)}}
 }}
 section[data-testid="stSidebar"] {{
   background:{sidebar}!important; height:100vh!important;
-  backdrop-filter:blur(6px); border-right:1px solid rgba(255,255,255,.18);
+  border-right:1px solid rgba(255,255,255,.14);
   z-index:1!important;
 }}
 [data-testid="stAppViewContainer"], .main {{ position:relative!important; z-index:2!important; }}
 [data-testid="stJson"], [data-testid="stDataFrame"], .stMetric, .element-container .stAlert {{
-  background:rgba(255,255,255,.40)!important; border-radius:12px!important;
-  border:1px solid rgba(255,255,255,.22)!important; backdrop-filter:blur(8px)!important;
-  box-shadow:0 2px 12px rgba(0,0,0,.06)!important;
+  background:rgba(8,18,13,.70)!important; border-radius:8px!important;
+  border:1px solid rgba(255,255,255,.12)!important;
+  box-shadow:0 12px 30px rgba(0,0,0,.22)!important;
 }}
 .stButton>button, .stDownloadButton>button {{
   background:{btn_grad}!important; color:{btn_text}!important;
-  border-radius:10px!important; padding:.6rem 1.2rem!important;
-  transition:.15s; box-shadow:0 4px 18px rgba(0,0,0,.15);
+  border-radius:8px!important; padding:.6rem 1.2rem!important;
+  transition:.15s; box-shadow:0 10px 22px rgba(0,0,0,.22);
 }}
 .stButton>button:hover, .stDownloadButton>button:hover {{
   transform:translateY(-1px); box-shadow:0 10px 28px rgba(0,0,0,.22);
@@ -439,6 +371,416 @@ section[data-testid="stSidebar"] {{
     inject_style('<div class="bg-decor" style="display:none"></div>')
 
 apply_theme(st.session_state["current_theme"])
+
+def apply_professional_overrides(theme: dict) -> None:
+    """Final UI layer: cleaner dashboard styling without changing app behavior."""
+    primary = theme.get("primary_color", "#4caf50")
+    secondary = theme.get("secondary_color", "#a5d6a7")
+    sidebar = theme.get("sidebar_bg", "rgba(15, 30, 30, 0.95)")
+    text = theme.get("text_color", "#e0ffe0")
+    title = theme.get("title_color", "#a5d6a7")
+    button_text = theme.get("button_text", "#0c1d1d")
+
+    st.markdown(
+        f"""
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+:root {{
+  --soil-primary: {primary};
+  --soil-secondary: {secondary};
+  --soil-text: {text};
+  --soil-title: {title};
+  --soil-surface: rgba(10, 24, 24, .72);
+  --soil-surface-soft: rgba(255, 255, 255, .08);
+  --soil-border: rgba(255, 255, 255, .14);
+}}
+
+.stApp {{
+  font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif !important;
+  color: var(--soil-text);
+}}
+
+.stApp::before,
+.stApp::after {{
+  opacity: .16 !important;
+  filter: blur(22px) !important;
+}}
+
+h1, h2, h3, h4, h5, h6 {{
+  font-family: 'Inter', system-ui, sans-serif !important;
+  letter-spacing: 0 !important;
+  text-shadow: none !important;
+  animation: none !important;
+}}
+
+[data-testid="stAppViewContainer"] > .main .block-container {{
+  max-width: 1280px;
+  padding: 2rem 2.4rem 3rem;
+}}
+
+section[data-testid="stSidebar"] {{
+  background: {sidebar} !important;
+  border-right: 1px solid var(--soil-border) !important;
+  box-shadow: 10px 0 30px rgba(0,0,0,.18);
+}}
+
+section[data-testid="stSidebar"] [data-testid="stMarkdownContainer"] p,
+section[data-testid="stSidebar"] [data-testid="stMarkdownContainer"] small {{
+  color: rgba(255,255,255,.78);
+}}
+
+.sidebar-header {{
+  padding: 8px 2px 4px;
+}}
+
+.sidebar-title {{
+  font-size: 1.22rem !important;
+  line-height: 1.2 !important;
+  margin: 0 !important;
+  color: var(--soil-title) !important;
+}}
+
+.sidebar-sub {{
+  margin-top: 4px;
+  color: rgba(255,255,255,.68);
+  font-size: .82rem;
+  font-weight: 500;
+}}
+
+.sidebar-status {{
+  border: 1px solid var(--soil-border);
+  border-radius: 8px;
+  padding: 12px;
+  background: rgba(255,255,255,.06);
+  margin: 12px 0 16px;
+}}
+
+.sidebar-status-title {{
+  font-size: .72rem;
+  font-weight: 800;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--soil-secondary);
+  margin-bottom: 8px;
+}}
+
+.sidebar-status-row {{
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: .82rem;
+  padding: 5px 0;
+  border-top: 1px solid rgba(255,255,255,.08);
+}}
+
+.sidebar-status-row:first-of-type {{
+  border-top: 0;
+}}
+
+.sidebar-status-row span:first-child {{
+  color: rgba(255,255,255,.62);
+}}
+
+.sidebar-status-row span:last-child {{
+  color: #fff;
+  font-weight: 700;
+  text-align: right;
+}}
+
+.page-header {{
+  margin: 0 0 1.2rem;
+  padding: 1.15rem 1.25rem;
+  border: 1px solid var(--soil-border);
+  border-left: 4px solid var(--soil-primary);
+  border-radius: 8px;
+  background: linear-gradient(135deg, rgba(255,255,255,.12), rgba(255,255,255,.045));
+  box-shadow: 0 14px 36px rgba(0,0,0,.18);
+}}
+
+.page-header h1 {{
+  margin: 0 !important;
+  color: var(--soil-title) !important;
+  font-size: clamp(1.55rem, 2vw, 2.25rem) !important;
+  line-height: 1.16 !important;
+  font-weight: 800 !important;
+}}
+
+.page-header p {{
+  margin: .55rem 0 0;
+  color: rgba(255,255,255,.78);
+  max-width: 860px;
+  font-size: .96rem;
+}}
+
+.page-eyebrow {{
+  margin-bottom: .45rem;
+  color: var(--soil-secondary);
+  font-size: .72rem;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  font-weight: 800;
+}}
+
+[data-testid="stMetric"],
+[data-testid="stDataFrame"],
+[data-testid="stTable"],
+.element-container .stAlert,
+div[data-testid="stExpander"],
+div[data-testid="stForm"] {{
+  border-radius: 8px !important;
+  border: 1px solid var(--soil-border) !important;
+  background: var(--soil-surface-soft) !important;
+  box-shadow: 0 10px 28px rgba(0,0,0,.14) !important;
+}}
+
+[data-testid="stMetric"] {{
+  padding: 12px 14px;
+}}
+
+[data-testid="stMetricLabel"] p {{
+  color: rgba(255,255,255,.68) !important;
+  font-weight: 700 !important;
+}}
+
+[data-testid="stMetricValue"] {{
+  color: #fff !important;
+  font-size: 1.45rem !important;
+}}
+
+.stButton>button,
+.stDownloadButton>button {{
+  min-height: 40px;
+  border: 0 !important;
+  border-radius: 8px !important;
+  font-weight: 800 !important;
+  color: {button_text} !important;
+  box-shadow: 0 8px 18px rgba(0,0,0,.18) !important;
+}}
+
+.stButton>button:hover,
+.stDownloadButton>button:hover {{
+  transform: translateY(-1px);
+  filter: brightness(1.04);
+}}
+
+.stTabs [data-baseweb="tab-list"] {{
+  gap: 8px;
+  border-bottom: 1px solid var(--soil-border);
+}}
+
+.stTabs [data-baseweb="tab"] {{
+  border-radius: 8px 8px 0 0;
+  background: rgba(255,255,255,.06);
+  padding: 10px 16px;
+  font-weight: 700;
+}}
+
+.stTabs [aria-selected="true"] {{
+  background: rgba(255,255,255,.16) !important;
+  color: #fff !important;
+}}
+
+hr {{
+  border-color: rgba(255,255,255,.12) !important;
+  margin: 1.2rem 0 !important;
+}}
+
+label, .stMarkdown, [data-testid="stCaptionContainer"] {{
+  color: rgba(255,255,255,.82) !important;
+}}
+
+.stApp {{
+  background:
+    linear-gradient(120deg, rgba(123,191,77,.08), transparent 34%),
+    linear-gradient(180deg, rgba(212,169,84,.055), transparent 32%),
+    repeating-linear-gradient(90deg, rgba(255,255,255,.018) 0 1px, transparent 1px 96px),
+    linear-gradient(135deg, #07130d 0%, #102418 52%, #1b2515 100%) !important;
+}}
+
+.stApp::before,
+.stApp::after {{
+  content: none !important;
+  display: none !important;
+}}
+
+[data-testid="stHeader"] {{
+  background: rgba(7,19,13,.76) !important;
+  border-bottom: 1px solid rgba(255,255,255,.08);
+  backdrop-filter: blur(10px);
+}}
+
+[data-testid="stAppViewContainer"] > .main .block-container {{
+  padding-top: 1.35rem;
+}}
+
+.page-header {{
+  position: relative;
+  overflow: hidden;
+  margin-bottom: 1.4rem;
+  padding: 1.35rem 1.45rem 1.28rem;
+  border-radius: 10px;
+  border: 1px solid rgba(238,247,223,.12);
+  border-left: 5px solid var(--soil-primary);
+  background:
+    linear-gradient(135deg, rgba(18,47,29,.94), rgba(11,27,18,.88)),
+    linear-gradient(90deg, rgba(212,169,84,.16), transparent);
+  box-shadow: 0 18px 44px rgba(0,0,0,.28);
+}}
+
+.page-header::after {{
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--soil-primary), var(--soil-secondary), transparent);
+  opacity: .85;
+}}
+
+.page-header h1 {{
+  color: #f5f1df !important;
+  font-size: clamp(1.7rem, 2.3vw, 2.45rem) !important;
+  letter-spacing: 0 !important;
+}}
+
+.page-header p {{
+  color: rgba(238,247,223,.78) !important;
+  font-size: .98rem;
+  line-height: 1.55;
+}}
+
+.page-eyebrow {{
+  color: #d4a954 !important;
+  letter-spacing: .12em;
+}}
+
+section[data-testid="stSidebar"] {{
+  background:
+    linear-gradient(180deg, rgba(7,19,13,.98), rgba(16,36,24,.98) 56%, rgba(7,19,13,.98)) !important;
+}}
+
+section[data-testid="stSidebar"] [data-testid="stVerticalBlock"] {{
+  gap: .45rem;
+}}
+
+.nav-link {{
+  border-radius: 8px !important;
+  margin: 3px 0 !important;
+  color: rgba(238,247,223,.82) !important;
+  transition: all .14s ease;
+}}
+
+.nav-link:hover {{
+  background: rgba(255,255,255,.075) !important;
+  color: #fff !important;
+}}
+
+.nav-link-selected {{
+  background: linear-gradient(90deg, #2f6b3f, #5f9f36) !important;
+  color: #fff !important;
+  box-shadow: 0 10px 24px rgba(0,0,0,.2);
+}}
+
+.sidebar-status {{
+  background: linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.045));
+  border-color: rgba(238,247,223,.13);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.06), 0 12px 30px rgba(0,0,0,.18);
+}}
+
+[data-testid="stMetric"],
+[data-testid="stDataFrame"],
+[data-testid="stTable"],
+.element-container .stAlert,
+div[data-testid="stExpander"],
+div[data-testid="stForm"] {{
+  background: linear-gradient(180deg, rgba(13,31,21,.82), rgba(8,20,13,.74)) !important;
+  border-color: rgba(238,247,223,.12) !important;
+  box-shadow: 0 16px 38px rgba(0,0,0,.24) !important;
+}}
+
+[data-testid="stMetric"] {{
+  border-left: 3px solid var(--soil-primary) !important;
+}}
+
+.stSelectbox [data-baseweb="select"],
+.stMultiSelect [data-baseweb="select"],
+.stNumberInput input,
+.stTextInput input,
+.stTextArea textarea {{
+  background: rgba(6,16,10,.76) !important;
+  border-color: rgba(238,247,223,.16) !important;
+  color: #f5f1df !important;
+  border-radius: 8px !important;
+}}
+
+.stSlider [data-baseweb="slider"] div {{
+  color: var(--soil-primary) !important;
+}}
+
+.stTabs [data-baseweb="tab-list"] {{
+  background: rgba(6,16,10,.34);
+  padding: 6px;
+  border-radius: 10px;
+  border: 1px solid rgba(238,247,223,.1);
+}}
+
+.stTabs [data-baseweb="tab"] {{
+  border-radius: 8px;
+  background: transparent;
+  color: rgba(238,247,223,.7);
+}}
+
+.stTabs [aria-selected="true"] {{
+  background: linear-gradient(90deg, rgba(47,107,63,.95), rgba(95,159,54,.9)) !important;
+  color: #fff !important;
+  box-shadow: 0 8px 18px rgba(0,0,0,.18);
+}}
+
+.stButton>button,
+.stDownloadButton>button {{
+  background: linear-gradient(90deg, #8bc34a, #5f9f36) !important;
+  border: 1px solid rgba(255,255,255,.16) !important;
+  text-transform: none;
+}}
+
+.stButton>button:focus,
+.stDownloadButton>button:focus {{
+  box-shadow: 0 0 0 3px rgba(139,195,74,.24), 0 8px 18px rgba(0,0,0,.18) !important;
+}}
+
+[data-testid="stFileUploader"] section {{
+  background: linear-gradient(180deg, rgba(13,31,21,.72), rgba(8,20,13,.66)) !important;
+  border: 1px dashed rgba(139,195,74,.45) !important;
+  border-radius: 10px !important;
+}}
+
+div[data-testid="stExpander"] summary {{
+  color: #f5f1df !important;
+  font-weight: 800;
+}}
+
+.js-plotly-plot,
+iframe {{
+  border-radius: 8px;
+  overflow: hidden;
+}}
+
+@media (max-width: 768px) {{
+  [data-testid="stAppViewContainer"] > .main .block-container {{
+    padding: 1rem 1rem 2rem;
+  }}
+  .page-header {{
+    padding: 1rem;
+  }}
+}}
+</style>
+        """,
+        unsafe_allow_html=True,
+    )
+
+apply_professional_overrides(st.session_state["current_theme"])
 
 # === SIDEBAR (UNCHANGED LAYOUT) ===
 with st.sidebar:
@@ -466,17 +808,35 @@ with st.sidebar:
             "nav-link": {
                 "font-size": "15px",
                 "text-align": "left",
-                "margin": "0px",
+                "margin": "3px 0",
+                "padding": "11px 12px",
+                "border-radius": "8px",
+                "color": st.session_state["current_theme"]["nav_link_color"],
+                "font-weight": "650",
             },
             "nav-link-selected": {
-                "background-color": st.session_state["current_theme"][
-                    "nav_link_selected_bg"
-                ]
+                "background": "linear-gradient(90deg, #2f6b3f, #5f9f36)",
+                "color": "#ffffff",
+                "font-weight": "800",
             },
         },
     )
     st.write("---")
-    render_workflow_tracker_sidebar()
+    df_status = "Loaded" if st.session_state.get("df") is not None else "No dataset"
+    model_status = "Trained" if st.session_state.get("model") is not None else "Not trained"
+    result_status = "Available" if st.session_state.get("results") is not None else "Pending"
+    st.markdown(
+        f"""
+        <div class="sidebar-status">
+            <div class="sidebar-status-title">System Status</div>
+            <div class="sidebar-status-row"><span>Dataset</span><span>{df_status}</span></div>
+            <div class="sidebar-status-row"><span>Mode</span><span>{st.session_state.get("task_mode", "Classification")}</span></div>
+            <div class="sidebar-status-row"><span>Model</span><span>{model_status}</span></div>
+            <div class="sidebar-status-row"><span>Results</span><span>{result_status}</span></div>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
     st.markdown(
         f"<div style='font-size:12px;color:{st.session_state['current_theme']['text_color']};opacity:0.85'>Developed for sustainable agriculture</div>",
         unsafe_allow_html=True,
@@ -877,6 +1237,11 @@ def upload_and_preprocess_widget():
     uploaded_files = st.file_uploader(
         "Select datasets", type=["csv", "xlsx"], accept_multiple_files=True
     )
+    uploaded_signature = (
+        tuple((file.name, getattr(file, "size", None)) for file in uploaded_files)
+        if uploaded_files
+        else None
+    )
 
     if st.session_state["df"] is not None and not uploaded_files:
         st.success(
@@ -891,8 +1256,29 @@ def upload_and_preprocess_widget():
             st.session_state["results"] = None
             st.session_state["model"] = None
             st.session_state["scaler"] = None
-            _workflow_reset()
+            st.session_state["uploaded_files_signature"] = None
             st.experimental_rerun()
+
+    if (
+        uploaded_files
+        and st.session_state["df"] is not None
+        and st.session_state.get("uploaded_files_signature") == uploaded_signature
+    ):
+        st.success(
+            f"✅ Using cached preprocessed dataset "
+            f"({st.session_state['df'].shape[0]} rows, "
+            f"{st.session_state['df'].shape[1]} cols)."
+        )
+        st.dataframe(st.session_state["df"].head())
+        st.caption("Dataset is already preprocessed. Clear it only when you need to reload the uploaded files.")
+        if st.button("🔁 Clear current dataset", key="clear_cached_dataset"):
+            st.session_state["df"] = None
+            st.session_state["results"] = None
+            st.session_state["model"] = None
+            st.session_state["scaler"] = None
+            st.session_state["uploaded_files_signature"] = None
+            st.experimental_rerun()
+        return
 
     cleaned_dfs = []
     if uploaded_files:
@@ -1000,7 +1386,7 @@ def upload_and_preprocess_widget():
                     )
 
             st.session_state["df"] = df
-            _workflow_mark(obj1_data_loaded=True, obj2_preprocessed=True)
+            st.session_state["uploaded_files_signature"] = uploaded_signature
             st.success("✨ Dataset preprocessed and stored in session.")
             st.write(f"Rows: {df.shape[0]} — Columns: {df.shape[1]}")
             st.dataframe(df.head())
@@ -1023,18 +1409,12 @@ def render_profile(name, asset_filename):
     .avatar-holo {
         width: 170px; height: 170px;
         border-radius: 50%;
-        background: conic-gradient(from 180deg at 50% 50%, #00ffd0, #fff700, #ff00d4, #00ffd0 100%);
+        background: conic-gradient(from 180deg at 50% 50%, #8bc34a, #d4a954, #2f6b3f, #8bc34a 100%);
         padding: 6px;
-        box-shadow: 0 0 19px 2px #00ffd088, 0 0 36px 11px #ff00d455;
+        box-shadow: 0 12px 28px rgba(0,0,0,.25), 0 0 0 1px rgba(238,247,223,.18);
         position: relative;
         margin-bottom: 18px;
         transition: box-shadow 0.3s ease;
-        animation: hologlow 2.9s infinite alternate;
-    }
-    @keyframes hologlow {
-      to {
-        box-shadow: 0 0 9px 6px #fff70077, 0 0 80px 11px #0ffbdd44;
-      }
     }
     .avatar-holo img {
         width: 100%; height: 100%; object-fit: cover; border-radius: 50%;
@@ -1043,21 +1423,21 @@ def render_profile(name, asset_filename):
     }
     .avatar-name {
       font-size: 22px; font-weight: 700;
-      color: #00ffd0; 
+      color: #f5f1df; 
       margin-bottom: 6px; margin-top: -4px;
       letter-spacing: 1px;
     }
     .avatar-role {
       font-size: 14px;
-      color: #444; font-style: italic;
+      color: rgba(238,247,223,.72); font-style: italic;
       padding-bottom: 2px;
     }
     .bsis-label {
       margin-top: 7px; margin-bottom: 7px;
       padding: 5px 18px; font-size: 16.5px; font-weight: 700;
-      color: #fff; background: linear-gradient(to right, #1dd1ff, #ff75db);
+      color: #07130d; background: linear-gradient(to right, #8bc34a, #d4a954);
       border-radius: 18px; border: none;
-      box-shadow: 0 2px 10px #00ffd066;
+      box-shadow: 0 8px 18px rgba(0,0,0,.22);
       text-align: center; display: inline-block; letter-spacing: 1.3px;
       outline: none;
       transition: background 0.2s;
@@ -1101,40 +1481,21 @@ def render_profile(name, asset_filename):
 
 # ---------------- MAIN PAGE LOGIC -----------------
 if page == "🏠 Home":
-    st.title(
-        "Machine Learning-Driven Soil Analysis for Sustainable Agriculture System"
-    )
-    st.markdown(
-        "<small style='color:rgba(255,255,255,0.75)'>Capstone Project</small>",
-        unsafe_allow_html=True,
-    )
-    st.write("---")
-    render_objective_banner(
-        "Objectives 1–2: Data Gathering → Preprocessing",
-        [
-            OBJECTIVES[0],
-            OBJECTIVES[1],
-        ],
-        next_hint="After uploading & preprocessing, go to 🤖 Modeling to train models.",
+    render_page_header(
+        "Soil Health Analysis Dashboard",
+        "Upload, clean, analyze, model, and interpret soil data for sustainable agriculture decisions.",
+        "Capstone Project",
     )
     st.write("")
     upload_and_preprocess_widget()
 
 elif page == "🤖 Modeling":
-    st.title("🤖 Modeling — Random Forest")
-    st.markdown(
-        "Train Random Forest models for Fertility (Regression) or Soil Health (Classification)."
+    render_page_header(
+        "Model Training",
+        "Train Random Forest models for soil health classification, fertility regression, and nutrient prediction.",
+        "Machine Learning",
     )
 
-    render_objective_banner(
-        "Objective 4: Predictive Modeling",
-        [
-            OBJECTIVES[3],
-            "Train a Random Forest for Fertility (Classification) or Nitrogen (Regression).",
-            "Train N/P/K nutrient-level predictors (below).",
-        ],
-        next_hint="After training, go to 📈 Results to evaluate accuracy/precision and explore predictions.",
-    )
     st.write("")
     if st.session_state["df"] is None:
         st.info("Please upload a dataset first in 'Home'.")
@@ -1156,11 +1517,12 @@ elif page == "🤖 Modeling":
             st.session_state["current_theme"] = theme_classification
 
         apply_theme(st.session_state["current_theme"])
+        apply_professional_overrides(st.session_state["current_theme"])
 
         switch_color = (
-            "#ff8aa2"
+            "#d4a954"
             if st.session_state["task_mode"] == "Regression"
-            else "#81c784"
+            else "#8bc34a"
         )
         st.markdown(
             f"""
@@ -1242,6 +1604,11 @@ elif page == "🤖 Modeling":
             X_scaled_df = pd.DataFrame(X_scaled, columns=selected_features)
 
             test_size = st.slider("Test set fraction (%)", 10, 40, 20, step=5)
+            deep_evaluation = st.checkbox(
+                "Run cross-validation + permutation importance (slower)",
+                value=False,
+                help="Turn this on only when you need the more detailed evaluation. Leaving it off makes training much faster.",
+            )
 
             # Keep class proportions in train/test for better evaluation on imbalanced data
             stratify_y = y if st.session_state["task_mode"] == "Classification" else None
@@ -1336,67 +1703,73 @@ elif page == "🤖 Modeling":
                         except Exception:
                             pass
 
-                    try:
-                        if st.session_state["task_mode"] == "Classification":
-                            cv_scores = cross_val_score(
-                                model,
-                                X_scaled_df,
-                                y,
-                                cv=5,
-                                scoring="accuracy",
-                            )
-                            cv_summary = {
-                                "mean_cv": float(np.mean(cv_scores)),
-                                "std_cv": float(np.std(cv_scores)),
-                            }
-                        else:
-                            cv_res = cross_validate(
-                                model,
-                                X_scaled_df,
-                                y,
-                                cv=5,
-                                scoring={
-                                    "r2": "r2",
-                                    "rmse": "neg_root_mean_squared_error",
-                                    "mae": "neg_mean_absolute_error",
-                                },
-                                return_train_score=False,
-                            )
-                            r2_scores = np.array(cv_res.get("test_r2", []), dtype=float)
-                            rmse_scores = -np.array(cv_res.get("test_rmse", []), dtype=float)
-                            mae_scores = -np.array(cv_res.get("test_mae", []), dtype=float)
+                    if deep_evaluation:
+                        try:
+                            if st.session_state["task_mode"] == "Classification":
+                                cv_scores = cross_val_score(
+                                    model,
+                                    X_scaled_df,
+                                    y,
+                                    cv=5,
+                                    scoring="accuracy",
+                                )
+                                cv_summary = {
+                                    "mean_cv": float(np.mean(cv_scores)),
+                                    "std_cv": float(np.std(cv_scores)),
+                                }
+                            else:
+                                cv_res = cross_validate(
+                                    model,
+                                    X_scaled_df,
+                                    y,
+                                    cv=5,
+                                    scoring={
+                                        "r2": "r2",
+                                        "rmse": "neg_root_mean_squared_error",
+                                        "mae": "neg_mean_absolute_error",
+                                    },
+                                    return_train_score=False,
+                                )
+                                r2_scores = np.array(cv_res.get("test_r2", []), dtype=float)
+                                rmse_scores = -np.array(cv_res.get("test_rmse", []), dtype=float)
+                                mae_scores = -np.array(cv_res.get("test_mae", []), dtype=float)
 
-                            cv_summary = {
-                                "mean_cv": float(np.mean(r2_scores)) if len(r2_scores) else None,
-                                "std_cv": float(np.std(r2_scores)) if len(r2_scores) else None,
-                                "r2_mean": float(np.mean(r2_scores)) if len(r2_scores) else None,
-                                "r2_std": float(np.std(r2_scores)) if len(r2_scores) else None,
-                                "rmse_mean": float(np.mean(rmse_scores)) if len(rmse_scores) else None,
-                                "rmse_std": float(np.std(rmse_scores)) if len(rmse_scores) else None,
-                                "mae_mean": float(np.mean(mae_scores)) if len(mae_scores) else None,
-                                "mae_std": float(np.std(mae_scores)) if len(mae_scores) else None,
-                            }
-                    except Exception:
+                                cv_summary = {
+                                    "mean_cv": float(np.mean(r2_scores)) if len(r2_scores) else None,
+                                    "std_cv": float(np.std(r2_scores)) if len(r2_scores) else None,
+                                    "r2_mean": float(np.mean(r2_scores)) if len(r2_scores) else None,
+                                    "r2_std": float(np.std(r2_scores)) if len(r2_scores) else None,
+                                    "rmse_mean": float(np.mean(rmse_scores)) if len(rmse_scores) else None,
+                                    "rmse_std": float(np.std(rmse_scores)) if len(rmse_scores) else None,
+                                    "mae_mean": float(np.mean(mae_scores)) if len(mae_scores) else None,
+                                    "mae_std": float(np.std(mae_scores)) if len(mae_scores) else None,
+                                }
+                        except Exception:
+                            cv_summary = None
+                    else:
                         cv_summary = None
 
-                    try:
-                        perm_imp = permutation_importance(
-                            model,
-                            X_test,
-                            y_test,
-                            n_repeats=10,
-                            random_state=42,
-                            n_jobs=-1,
-                        )
-                        perm_df = pd.DataFrame(
-                            {
-                                "feature": selected_features,
-                                "importance": perm_imp.importances_mean,
-                            }
-                        )
-                        perm_df = perm_df.sort_values("importance", ascending=False)
-                        perm_data = perm_df.to_dict("records")
-                    except Exception:
+                    if deep_evaluation:
+                        try:
+                            perm_imp = permutation_importance(
+                                model,
+                                X_test,
+                                y_test,
+                                n_repeats=5,
+                                random_state=42,
+                                n_jobs=-1,
+                            )
+                            perm_df = pd.DataFrame(
+                                {
+                                    "feature": selected_features,
+                                    "importance": perm_imp.importances_mean,
+                                }
+                            )
+                            perm_df = perm_df.sort_values("importance", ascending=False)
+                            perm_data = perm_df.to_dict("records")
+                        except Exception:
+                            perm_data = None
+                    else:
                         perm_data = None
 
                     st.session_state["model"] = model
@@ -1413,20 +1786,20 @@ elif page == "🤖 Modeling":
                         "permutation_importance": perm_data,
                     }
                     st.session_state["trained_on_features"] = selected_features
-                    _workflow_mark(obj4_model_trained=True)
                     st.success(
                         "✅ Training completed. Go to 'Results' to inspect performance and explanations."
                     )
 
 
 # =====================
-        # Objective 4 (Extension): Nutrient deficiency prediction
+        # Nutrient deficiency prediction
         # =====================
         st.markdown("---")
         st.subheader("🧪 Nutrient Deficiency Prediction")
-        st.caption(
-            "Objective 4 extension: train additional Random Forest regressors to **predict nutrient levels** "
-            "(Nitrogen / Phosphorus / Potassium) and help flag potential deficiencies."
+        st.info(
+            "Train additional Random Forest regressors to **predict nutrient levels** "
+            "(Nitrogen / Phosphorus / Potassium) and help flag potential deficiencies.",
+            icon="🧪",
         )
 
         with st.expander("Train nutrient-level predictors (N / P / K)", expanded=False):
@@ -1511,33 +1884,24 @@ elif page == "🤖 Modeling":
                                     st.session_state["nutrient_scalers"][tgt] = scaler_n
                                     st.session_state["nutrient_features"][tgt] = feat_nut
 
-                                _workflow_mark(obj4_model_trained=True)
 
                                 st.success("✅ Nutrient predictors trained and saved in session.")
                                 st.dataframe(pd.DataFrame(metrics).T, use_container_width=True)
                                 st.caption("**Nutrient model metrics:** Higher **R²** and lower **RMSE/MAE** indicate better predictions for that nutrient. Use this to compare which nutrient is easiest/hardest to predict from your features.")
 
 elif page == "📊 Visualization":
-    st.title("📊 Visual Analytics")
-    st.markdown(
-        "All charts are organized by goal: **EDA** (understand the data), **Spatial** (maps), and **Clusters** (groupings)."
+    render_page_header(
+        "Visual Analytics",
+        "Explore distributions, correlations, spatial patterns, and soil clusters in one organized workspace.",
+        "Exploration",
     )
 
-    render_objective_banner(
-        "Objective 3: Key Soil Parameters & Trends",
-        [
-            OBJECTIVES[2],
-            "Use EDA (distributions + correlations), Spatial maps, and Clusters to spot patterns.",
-        ],
-        next_hint="Tip: Train a model in 🤖 Modeling, then confirm the most influential parameters in 📈 Results.",
-    )
     st.write("")
 
     if st.session_state["df"] is None:
         st.info("Please upload data first in 'Home' (Upload Data is integrated there).")
     else:
         df = st.session_state["df"].copy()
-        _workflow_mark(obj3_params_identified=True)
 
         # Ensure a fertility label exists (used by several visuals)
         if "Nitrogen" in df.columns and "Fertility_Level" not in df.columns:
@@ -1553,7 +1917,7 @@ elif page == "📊 Visualization":
         has_coords = ("Latitude" in df.columns) and ("Longitude" in df.columns)
         if has_coords:
             try:
-                land_count = len(_filter_mindanao_land_only(df))
+                land_count = len(_cached_filter_mindanao_land_only(df))
             except Exception:
                 land_count = 0
             c4.metric("Mindanao land points", f"{land_count:,}")
@@ -1697,6 +2061,13 @@ elif page == "📊 Visualization":
                     st.info("Seaborn is not installed, so pairplots are unavailable.")
                 elif len(features) < 2:
                     st.info("Not enough numeric columns available for a pairplot.")
+                elif not st.toggle(
+                    "Render pairplot now",
+                    value=False,
+                    key="render_nb_pairplot",
+                    help="Pairplots are expensive, so they stay off until you need them.",
+                ):
+                    st.info("Turn this on only when you want to generate the pairplot.")
                 else:
                     max_n = 1500 if performance_mode else 6000
                     sample_n = st.slider(
@@ -1720,6 +2091,13 @@ elif page == "📊 Visualization":
                     st.info("Seaborn is not installed, so KDE histograms are unavailable.")
                 elif not features:
                     st.info("No notebook numeric features found in this dataset.")
+                elif not st.toggle(
+                    "Render KDE histograms now",
+                    value=False,
+                    key="render_nb_histograms",
+                    help="Keeps the page responsive by skipping these matplotlib charts until requested.",
+                ):
+                    st.info("Turn this on to generate the KDE histogram charts.")
                 else:
                     chosen = st.multiselect("Choose features", features, default=features, key="nb_hist_features")
                     for f in chosen:
@@ -1742,6 +2120,13 @@ elif page == "📊 Visualization":
                     st.info("Fertility label not found. Expected `fertility_class` or `Fertility_Level`.")
                 elif not features:
                     st.info("No notebook numeric features found in this dataset.")
+                elif not st.toggle(
+                    "Render fertility boxplots now",
+                    value=False,
+                    key="render_nb_boxplots",
+                    help="Keeps these charts from being rebuilt on every Streamlit rerun.",
+                ):
+                    st.info("Turn this on to generate the boxplots.")
                 else:
                     chosen = st.multiselect(
                         "Choose features",
@@ -1786,6 +2171,15 @@ elif page == "📊 Visualization":
                     else:
                         st.dataframe(pairs[["Feature1", "Feature2", "Correlation"]], use_container_width=True)
                         st.caption("**Highly correlated pairs:** Values near **+1/-1** mean the two features move together strongly. Very high absolute correlation can suggest redundancy (you may keep one) or a meaningful relationship worth discussing.")
+                        render_corr_plots = st.toggle(
+                            "Render correlated-pair scatterplots now",
+                            value=False,
+                            key="render_nb_corr_plots",
+                            help="The table is quick; the scatterplots are generated only when requested.",
+                        )
+                        if not render_corr_plots:
+                            st.info("Turn this on to generate the scatterplots.")
+                            pairs = pairs.iloc[0:0]
                         for _, r in pairs.iterrows():
                             f1, f2, cval = r["Feature1"], r["Feature2"], r["Correlation"]
                             dtmp = df[[f1, f2]].dropna()
@@ -1837,13 +2231,20 @@ elif page == "📊 Visualization":
                     nutrients = [c for c in ["Nitrogen", "Phosphorus", "Potassium"] if c in df.columns]
                     if not nutrients:
                         st.info("N/P/K columns not found.")
+                    elif not st.toggle(
+                        "Render geo scatterplots now",
+                        value=False,
+                        key="render_geo_scatterplots",
+                        help="Geo filtering and matplotlib rendering can be slow on larger datasets.",
+                    ):
+                        st.info("Turn this on to generate the geographical nutrient scatterplots.")
                     else:
                         for n in nutrients:
                             dtmp = df[[lat_col, lon_col, n]].dropna().copy()
 
                             # Land-only filtering (hides offshore points without changing the main dataset)
                             dstd = dtmp.rename(columns={lat_col: "Latitude", lon_col: "Longitude"})
-                            dstd = _filter_mindanao_land_only(dstd)
+                            dstd = _cached_filter_mindanao_land_only(dstd)
                             dtmp = dstd.rename(columns={"Latitude": lat_col, "Longitude": lon_col})
 
                             if dtmp.empty:
@@ -1893,6 +2294,13 @@ elif page == "📊 Visualization":
                     st.info("Fertility label not found (expected `fertility_class` or `Fertility_Level`).")
                 elif lat_col is None or lon_col is None:
                     st.info("Latitude/Longitude not found for folium mapping.")
+                elif not st.toggle(
+                    "Render interactive Folium maps now",
+                    value=False,
+                    key="render_folium_maps",
+                    help="Interactive maps are one of the slowest parts of this app, so they are generated on demand.",
+                ):
+                    st.info("Turn this on to build the interactive fertility maps.")
                 else:
                     color_map = {"Low": "red", "Moderate": "orange", "High": "green"}
 
@@ -1900,7 +2308,7 @@ elif page == "📊 Visualization":
 
                     # Keep the view clean by removing offshore points (does not change your main dataset)
                     base_std = base.rename(columns={lat_col: "Latitude", lon_col: "Longitude"}).copy()
-                    base_std = _filter_mindanao_land_only(base_std)
+                    base_std = _cached_filter_mindanao_land_only(base_std)
 
                     base_std[lat_col] = base_std["Latitude"]
                     base_std[lon_col] = base_std["Longitude"]
@@ -1914,6 +2322,9 @@ elif page == "📊 Visualization":
                         if sub_df.empty:
                             st.warning("No rows available for this map.")
                             return
+                        if performance_mode and len(sub_df) > 1500:
+                            sub_df = sub_df.sample(1500, random_state=42)
+                            st.caption("Performance mode: showing a representative 1,500-point sample on this map.")
 
                         center_lat = float(sub_df[lat_col].mean())
                         center_lon = float(sub_df[lon_col].mean())
@@ -2048,6 +2459,13 @@ elif page == "📊 Visualization":
                 st.info("Seaborn is not installed, so cluster pairplot is unavailable.")
             elif len(features) < 2:
                 st.info("Not enough features for KMeans + pairplot.")
+            elif not st.toggle(
+                "Run KMeans cluster pairplot now",
+                value=False,
+                key="render_kmeans_pairplot",
+                help="KMeans plus seaborn pairplots can be slow, so this runs only when requested.",
+            ):
+                st.info("Turn this on to run KMeans and generate the cluster pairplot.")
             else:
                 k = st.slider("KMeans clusters (K)", 2, 8, 3, 1, key="kmeans_k")
                 max_n = 1500 if performance_mode else 6000
@@ -2080,24 +2498,18 @@ elif page == "📊 Visualization":
 
 
 elif page == "📈 Results":
-    st.title("📈 Model Results & Interpretation")
-
-    render_objective_banner(
-        "Objective 5: Model Evaluation for Precision",
-        [
-            OBJECTIVES[4],
-            "Inspect Accuracy / Precision / Recall / F1 (Classification) or RMSE/MAE/R² (Regression).",
-            "Use Feature Importance & Permutation Importance to validate key drivers (Objective 3).",
-        ],
-        next_hint="After evaluation, use 🌿 Insights to translate findings into crop & management guidance.",
+    render_page_header(
+        "Model Results",
+        "Review performance metrics, prediction quality, feature importance, and saved model outputs.",
+        "Evaluation",
     )
+
     st.write("")
     if not st.session_state.get("results"):
         st.info(
             "No trained model in session. Train a model first (Modeling or Quick Model)."
         )
     else:
-        _workflow_mark(obj5_evaluated=True, obj3_params_identified=True)
         results = st.session_state["results"]
         task = results["task"]
         y_test = np.array(results["y_test"])
@@ -2152,7 +2564,7 @@ elif page == "📈 Results":
         metrics_col, explain_col = st.columns([2, 1])
         with metrics_col:
             st.subheader("Performance Metrics")
-            st.caption("These scores summarize how well the model performs on the **test set**. Use them to justify model reliability for Objective 5 (precision/evaluation).")
+            st.caption("These scores summarize how well the model performs on the **test set**. Use them to justify model reliability.")
             if task == "Classification":
                 try:
                     acc = accuracy_score(y_test, y_pred)
@@ -2317,7 +2729,7 @@ elif page == "📈 Results":
         st.markdown("---")
 
         st.subheader("🌳 Random Forest Feature Importance")
-        st.caption("**Interpretation:** This explains which inputs the trained forest relied on most. Use it to support Objective 3 (major parameters) and to sanity-check that the model focuses on meaningful soil factors.")
+        st.caption("**Interpretation:** This explains which inputs the trained forest relied on most. Use it to sanity-check that the model focuses on meaningful soil factors.")
         feat_names = results.get("X_columns", [])
         fi_list = results.get("feature_importances", [])
 
@@ -2400,7 +2812,7 @@ elif page == "📈 Results":
                         plt.figure()
                         shap.summary_plot(shap_vals, X_explain, plot_type="bar", show=False)
                         st.pyplot(plt.gcf(), clear_figure=True)
-                        st.caption("**SHAP importance (bar):** Average absolute impact of each feature. Use this as an interpretable ranking to support Objective 3 (major influencing parameters).")
+                        st.caption("**SHAP importance (bar):** Average absolute impact of each feature. Use this as an interpretable ranking to identify major influencing parameters.")
                     except Exception as e:
                         st.info(f"SHAP explanation could not be generated: {e}")
 
@@ -2639,7 +3051,11 @@ elif page == "📈 Results":
                         st.info("No predictions were produced. Ensure your nutrient models and feature columns match this dataset.")
 
 elif page == "🌿 Insights":
-    st.title("🌿 Soil Health Insights & Crop Recommendations")
+    render_page_header(
+        "Soil Health Insights",
+        "Translate soil conditions and model outputs into crop suitability and management guidance.",
+        "Recommendations",
+    )
     if st.session_state["df"] is None:
         st.info("Upload and preprocess a dataset first (Home).")
     else:
@@ -2964,7 +3380,11 @@ elif page == "🌿 Insights":
                 st.caption("**Clusters:** Each color is a group of samples with similar soil/environment patterns based on the selected features. Use this to discuss natural groupings or zones in your study area.")
 
 elif page == "👤 About":
-    st.title("👤 About the Makers")
+    render_page_header(
+        "About the Makers",
+        "Project contributors and development background.",
+        "Team",
+    )
     st.markdown("<div style='font-size:19px;'>Developed by:</div>", unsafe_allow_html=True)
     st.write("")
     col_a, col_b = st.columns([1, 1])
@@ -2974,7 +3394,7 @@ elif page == "👤 About":
         render_profile("Rica Baliling", "rica_baliling.png")
     st.markdown("---")
     st.markdown(
-        "<div style='font-size:15px;color:#cd5fff;font-weight:600;'>All glory to God.</div>",
+        "<div style='font-size:15px;color:#d4a954;font-weight:700;'>All glory to God.</div>",
         unsafe_allow_html=True,
     )
     st.write("Developed for a capstone project.")
