@@ -21,8 +21,8 @@ from sklearn.metrics import (
 from sklearn.inspection import permutation_importance
 from sklearn.cluster import KMeans
 from io import BytesIO
+from contextlib import nullcontext
 import joblib
-import time
 import base64
 from PIL import Image
 import warnings
@@ -203,6 +203,13 @@ st.set_page_config(
 )
 
 inject_tuqlas_chatbot()
+
+
+def silent_spinner(*args, **kwargs):
+    return nullcontext()
+
+
+st.spinner = silent_spinner
 
 # === THEMES (UNCHANGED) ===
 theme_classification = {
@@ -1723,7 +1730,6 @@ elif page == "🤖 Modeling":
                         "Consider lowering for faster results."
                     )
                 with st.spinner("Training Random Forest..."):
-                    time.sleep(0.25)
                     if st.session_state["task_mode"] == "Classification":
                         # Handle class imbalance automatically (helps minority classes like "High")
                         class_weight = None
@@ -1749,7 +1755,7 @@ elif page == "🤖 Modeling":
                             n_jobs=-1,
                         )
 
-                    with st.spinner(🤖 Training Random Forest model..."):
+                    with st.spinner("Training Random Forest model..."):
                         model.fit(X_train, y_train)
                         # Default prediction
                         y_pred = model.predict(X_test)
